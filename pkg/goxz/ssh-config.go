@@ -19,7 +19,6 @@ func parsePrivateKey() (ssh.Signer, error) {
 			return nil, errors.New("File " + os.Getenv("SSH_KEY_PATH") + " doesn't exist!")
 		}
 		buff, _ := ioutil.ReadFile(os.Getenv("SSH_KEY_PATH"))
-		// read $HOME/.ssh/id_rsa, check if SSH_KEY_PASSPHRASE provided
 		if os.Getenv("SSH_KEY_PASSPHRASE") != "" {
 			signer, err := ssh.ParsePrivateKeyWithPassphrase(buff, []byte(os.Getenv("SSH_KEY_PASSPHRASE")))
 			return signer, err

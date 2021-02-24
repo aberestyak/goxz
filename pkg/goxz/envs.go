@@ -5,7 +5,8 @@ import (
 	"strconv"
 )
 
-var mandatoryEnvs = []string{"SOCKS_HOST", "SOCKS_PORT", "REMOTE_SSH_HOST", "REMOTE_SSH_PORT", "REMOTE_SSH_USER", "REMOTE_FORWARD_HOST", "REMOTE_FOWARD_PORT"}
+var mandatoryEnvs = []string{"REMOTE_SSH_HOST", "REMOTE_SSH_PORT", "REMOTE_SSH_USER", "REMOTE_FORWARD_HOST", "REMOTE_FOWARD_PORT"}
+var mandotorySOCKSEnvs = []string{"SOCKS_HOST", "SOCKS_PORT"}
 var authEnvs = []string{"SSH_KEY_PATH", "SSH_AUTH_SOCK", "SSH_USER_PASSWORD"}
 
 // Check that all mandotory and, at least one authEnv, envs are set.
@@ -27,6 +28,17 @@ func validateEnvs() error {
 	}
 
 	return errors.New("none of auth envs (SSH_KEY_PATH, SSH_AUTH_SOCK, SSH_USER_PASSWORD) is set")
+}
+
+func validateSOCKSEnvs() error {
+	if os.Getenv("SOCKS_ENABLED") == "true" {
+		for _, env := range mandotorySOCKSEnvs {
+			if os.Getenv(env) == "" {
+				return errors.New("SOCKS enabled, but mandatory SOCKS env " + env + " is not set")
+			}
+		}
+	}
+	return nil
 }
 
 var localEndpoint = endpoint{
