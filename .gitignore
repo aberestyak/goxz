@@ -6,6 +6,7 @@
 *.o
 *.a
 *.dylib
+__debug_bin
 
 # pkger generated
 **/pkged.go
