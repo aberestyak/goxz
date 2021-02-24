@@ -54,7 +54,6 @@ func startServer() {
 			}
 			transferData(client, local)
 			local.Close()
-			return
 		}()
 	}
 

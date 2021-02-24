@@ -48,7 +48,6 @@ func startClient() {
 			}
 			transferData(client, remote)
 			remote.Close()
-			return
 		}()
 	}
 }
