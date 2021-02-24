@@ -11,12 +11,13 @@
       "mode": "debug",
       "program": "${workspaceFolder}",
       "env": {
-        "SOCKS_HOST": "0.0.0.0",
+        "SOCKS_ENABLED": "true",
+        "SOCKS_HOST": "127.0.0.1",
         "SOCKS_PORT": "9801",
         "REMOTE_SSH_HOST": "10.10.10.14",
         "REMOTE_SSH_USER": "ops",
         "REMOTE_SSH_PORT": "22",
-        "REMOTE_FORWARD_HOST": "0.0.0.0",
+        "REMOTE_FORWARD_HOST": "127.0.0.1",
         "REMOTE_FOWARD_PORT": "9801",
         "SSH_USER_PASSWORD": "abc",
       }
