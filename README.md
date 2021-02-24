@@ -34,3 +34,4 @@ Also you must specify at least one of environment variables to use for authentic
 ## TODO:
 
 - [x] Dockerfile for build and runtime
+- [ ] Implement tun2socks?
