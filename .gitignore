@@ -41,7 +41,7 @@ vendor/
 /.go
 
 ### vscode ###
-/.vscode
+/.vscode/launch_local.json
 
 /.go
 /.idea

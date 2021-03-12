@@ -10,6 +10,35 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/cmd/goxz/goxz.go",
+      // "args": ["server"],
+      // "env": {
+      //   "SERVER_HOST_TCP-UDP": "0.0.0.0",
+      //   "SERVER_PORT_TCP-UDP": "5553",
+      //   "LOCAL_HOST_TCP": "127.0.0.1",
+      //   "LOCAL_PORT_TCP": "9802",
+      //   "REMOTE_HOST_UDP": "10.10.10.11",
+      //   "REMOTE_PORT_UDP": "53",
+      //   "BASTION_HOST_SSH": "10.10.10.10",
+      //   "BASTION_PORT_SSH": "22",
+      //   "BASTION_SSH_USER": "root",
+      //   "BASTION_HOST_TCP": "127.0.0.1",
+      //   "BASTION_PORT_TCP": "9801",
+      //   "SSH_KEY_PATH": "~/.ssh/id_rsa",
+      // }
+      "args": ["client"],
+      "env": {
+        "LOCAL_HOST_TCP": "127.0.0.1",
+        "LOCAL_PORT_TCP": "9802",
+        "CLIENT_HOST_UDP": "127.0.0.1",
+        "CLIENT_PORT_UDP": "5553",
+        "BASTION_SSH_USER": "root",
+        "BASTION_HOST_SSH": "10.10.10.10",
+        "BASTION_PORT_SSH": "22",
+        "BASTION_HOST_TCP": "127.0.0.1",
+        "BASTION_PORT_TCP": "9802",
+        "SERVER_HOST_TCP-UDP": "10.10.10.12",
+        "SERVER_PORT_TCP-UDP": "5553",
+      }
     }
   ]
 }
