@@ -2,6 +2,7 @@ package cmd // local service to be forwarded
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 )
@@ -11,7 +12,8 @@ type endpoint struct {
 	Port int
 }
 
-var mandatoryEnvs = []string{"LOCAL_HOST", "LOCAL_PORT", "REMOTE_SSH_HOST", "REMOTE_SSH_PORT", "REMOTE_SSH_USER", "REMOTE_FORWARD_HOST", "REMOTE_FORWARD_PORT"}
+var mandatoryServerEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "SERVER_HOST_TCP-UDP", "SERVER_PORT_TCP-UDP", "REMOTE_HOST_UDP", "REMOTE_PORT_UDP"}
+var mandatoryClientEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "CLIENT_HOST_UDP", "CLIENT_PORT_UDP", "SERVER_HOST_TCP-UDP", "SERVER_PORT_TCP-UDP"}
 var authEnvs = []string{"SSH_KEY_PATH", "SSH_AUTH_SOCK", "SSH_USER_PASSWORD"}
 
 func (endpoint *endpoint) String() string {
@@ -19,48 +21,89 @@ func (endpoint *endpoint) String() string {
 }
 
 // Check that all mandotory and, at least one authEnv, envs are set.
-func validateEnvs() error {
-	for _, env := range mandatoryEnvs {
-		if os.Getenv(env) == "" {
-			return errors.New("mandatory env " + env + " is not set")
+func validateEnvs(mode string) error {
+	validate := func(mandatoryEnvs []string) error {
+		for _, env := range mandatoryEnvs {
+			if os.Getenv(env) == "" {
+				return errors.New("mandatory env " + env + " is not set")
+			}
 		}
-	}
-	authEnvsFound := false
-	for _, env := range authEnvs {
-		if os.Getenv(env) != "" {
-			authEnvsFound = true
-			break
+		authEnvsFound := false
+		for _, env := range authEnvs {
+			if os.Getenv(env) != "" {
+				authEnvsFound = true
+				break
+			}
 		}
-	}
-	if authEnvsFound {
-		return nil
+		if authEnvsFound {
+			return nil
+		} else {
+			return errors.New("none of auth envs (SSH_KEY_PATH, SSH_AUTH_SOCK, SSH_USER_PASSWORD) is set")
+		}
 	}
 
-	return errors.New("none of auth envs (SSH_KEY_PATH, SSH_AUTH_SOCK, SSH_USER_PASSWORD) is set")
+	switch mode {
+	case "server":
+		if err := validate(mandatoryServerEnvs); err != nil {
+			return err
+		}
+	case "client":
+		if err := validate(mandatoryClientEnvs); err != nil {
+			return err
+		}
+	default:
+		return ErrIncorrectArg
+	}
+	return nil
 }
 
-var localEndpoint = endpoint{
-	Host: os.Getenv("LOCAL_HOST"),
+var localTCPEndpoint = endpoint{
+	Host: os.Getenv("LOCAL_HOST_TCP"),
 	Port: func() int {
-		port, _ := strconv.Atoi(os.Getenv("LOCAL_PORT"))
+		port, _ := strconv.Atoi(os.Getenv("LOCAL_PORT_TCP"))
+		return port
+	}(),
+}
+
+var clientUDPEndpoint = &net.UDPAddr{
+	IP: net.ParseIP(os.Getenv("CLIENT_HOST_UDP")),
+	Port: func() int {
+		port, _ := strconv.Atoi(os.Getenv("CLIENT_PORT_UDP"))
 		return port
 	}(),
 }
 
 // remote SSH server
-var serverEndpoint = endpoint{
-	Host: os.Getenv("REMOTE_SSH_HOST"),
+var bastionEndpoint = endpoint{
+	Host: os.Getenv("BASTION_HOST_SSH"),
 	Port: func() int {
-		port, _ := strconv.Atoi(os.Getenv("REMOTE_SSH_PORT"))
+		port, _ := strconv.Atoi(os.Getenv("BASTION_PORT_SSH"))
 		return port
 	}(),
 }
 
 // remote forwarding port (on remote SSH server network)
-var remoteEndpoint = endpoint{
-	Host: os.Getenv("REMOTE_FORWARD_HOST"),
+var bastionTCPEndpoint = endpoint{
+	Host: os.Getenv("BASTION_HOST_TCP"),
 	Port: func() int {
-		port, _ := strconv.Atoi(os.Getenv("REMOTE_FORWARD_PORT"))
+		port, _ := strconv.Atoi(os.Getenv("BASTION_PORT_TCP"))
+		return port
+	}(),
+}
+
+// remote for to forward UDP traffic. Bastion here
+var serverTCPtoUDPEndpoint = endpoint{
+	Host: os.Getenv("SERVER_HOST_TCP-UDP"),
+	Port: func() int {
+		port, _ := strconv.Atoi(os.Getenv("SERVER_PORT_TCP-UDP"))
+		return port
+	}(),
+}
+
+var remoteUDPEndpoint = &net.UDPAddr{
+	IP: net.ParseIP(os.Getenv("REMOTE_HOST_UDP")),
+	Port: func() int {
+		port, _ := strconv.Atoi(os.Getenv("REMOTE_PORT_UDP"))
 		return port
 	}(),
 }

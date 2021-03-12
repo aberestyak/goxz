@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -33,10 +34,12 @@ func NewCmdGoXz() *cobra.Command {
 			if err := validateArgs(args); err != nil {
 				return err
 			}
+			if err := validateEnvs(args[0]); err != nil {
+				log.Fatalf("Error while envs validation: %s\n", err)
+			}
 			if err := start(args); err != nil {
 				return err
 			}
-
 			return nil
 		},
 	}

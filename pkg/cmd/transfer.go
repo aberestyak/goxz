@@ -15,8 +15,7 @@ func transferData(client net.Conn, remote net.Conn) {
 
 	// Start remote -> local data transfer
 	go func() {
-		_, err := io.Copy(client, remote)
-		if err != nil {
+		if _, err := io.Copy(client, remote); err != nil {
 			// To prevent "errors" whith closed connection
 			if !strings.Contains(err.Error(), "use of closed network connection") {
 				log.Printf("error while copy remote->local: %s\n", err)
@@ -27,8 +26,7 @@ func transferData(client net.Conn, remote net.Conn) {
 
 	// Start local -> remote data transfer
 	go func() {
-		_, err := io.Copy(remote, client)
-		if err != nil {
+		if _, err := io.Copy(remote, client); err != nil {
 			// To prevent "errors" whith closed connection
 			if !strings.Contains(err.Error(), "use of closed network connection") {
 				log.Printf("error while copy local->remote: %s\n", err)
@@ -38,4 +36,18 @@ func transferData(client net.Conn, remote net.Conn) {
 	}()
 
 	<-chDone
+}
+
+func TCPtoUDP(udpBuf []byte, udpBufLen int, sourceAddress *net.UDPAddr, localConn *net.UDPConn, remoteTCPConn net.Conn) {
+	tcpBuf := make([]byte, 1500)
+	defer remoteTCPConn.Close()
+
+	if _, err := remoteTCPConn.Write(udpBuf[:udpBufLen]); err != nil {
+		log.Fatalf("Could not write packet to tcp connection: %v", err)
+	}
+
+	tcpBufLen, _ := remoteTCPConn.Read(tcpBuf)
+	if _, err := localConn.WriteToUDP(tcpBuf[:tcpBufLen], sourceAddress); err != nil {
+		log.Fatalf("Could not send TCP to UDP response: %v", err)
+	}
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"log"
 	"net"
 	"os"
@@ -8,46 +9,75 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func startClient() {
-	if err := validateEnvs(); err != nil {
-		log.Fatalf("Error while envs validation: %s\n", err)
-	}
-
-	sshConfig, err := makeSSHConfig(os.Getenv("REMOTE_SSH_USER"))
+func forwardTCP() error {
+	sshConfig, err := makeSSHConfig(os.Getenv("BASTION_SSH_USER"))
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
-
 	// Connect to SSH remote server using serverEndpoint
-	serverConn, err := ssh.Dial("tcp", serverEndpoint.String(), sshConfig)
+	serverConn, err := ssh.Dial("tcp", bastionEndpoint.String(), sshConfig)
 	if err != nil {
-		log.Fatalf("Dial INTO remote server error: %s\n", err)
+		return errors.New("Dial INTO remote server error: " + err.Error())
 	}
-	log.Println("Connected to " + serverEndpoint.String())
+	log.Println("Connected to " + bastionEndpoint.String())
 	defer serverConn.Close()
 
 	// Listen on remote local port
-	local, err := net.Listen("tcp", localEndpoint.String())
+	local, err := net.Listen("tcp", localTCPEndpoint.String())
 	if err != nil {
-		log.Fatalf("Listen open port ON local server error: %s\n", err)
+		return errors.New("Listen open port ON local server error: " + err.Error())
 	}
 	defer local.Close()
-	log.Println("Start linstening " + localEndpoint.String())
+	log.Println("Start linstening " + localTCPEndpoint.String())
 
 	// handle incoming connections on reverse forwarded port
 	for {
 		client, err := local.Accept()
 		if err != nil {
-			log.Fatalln(err)
+			return err
 		}
 		// Establish new connection with remote server for each incoming connection
 		go func() {
-			remote, err := serverConn.Dial("tcp4", remoteEndpoint.String())
+			remote, err := serverConn.Dial("tcp4", bastionTCPEndpoint.String())
 			if err != nil {
 				log.Fatalln(err)
 			}
 			transferData(client, remote)
 			remote.Close()
 		}()
+	}
+}
+
+func forwardUDPOverTCP() error {
+	// Open local UDP port
+	localTCPConn, err := net.ListenUDP("udp", clientUDPEndpoint)
+	if err != nil {
+		return errors.New("Listen open port ON local server error: " + err.Error())
+	}
+	defer localTCPConn.Close()
+	log.Println("Start linstening " + clientUDPEndpoint.String())
+
+	for {
+		udpBuf := make([]byte, 1500)
+		udpBufLen, clientAddress, err := localTCPConn.ReadFromUDP(udpBuf)
+		if err != nil {
+			return err
+		}
+		go func() {
+			remoteTCPConn, err := net.Dial("tcp4", serverTCPtoUDPEndpoint.String())
+			if err != nil {
+				log.Fatalf("Cant dial remote TCP to UDP endpoint: %v", err)
+			}
+			TCPtoUDP(udpBuf, udpBufLen, clientAddress, localTCPConn, remoteTCPConn)
+		}()
+	}
+}
+
+func startClient() {
+
+	go forwardUDPOverTCP()
+
+	if err := forwardTCP(); err != nil {
+		log.Fatal(err.Error())
 	}
 }

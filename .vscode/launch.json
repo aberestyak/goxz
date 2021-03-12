@@ -10,18 +10,6 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/cmd/goxz/goxz.go",
-      "args": ["server"],
-      "env": {
-        "SOCKS_ENABLED": "true",
-        "LOCAL_HOST": "127.0.0.1",
-        "LOCAL_PORT": "9801",
-        "REMOTE_SSH_HOST": "10.10.10.14",
-        "REMOTE_SSH_USER": "root",
-        "REMOTE_SSH_PORT": "22",
-        "REMOTE_FORWARD_HOST": "127.0.0.1",
-        "REMOTE_FORWARD_PORT": "9801",
-        "SSH_USER_PASSWORD": "abc",
-      }
     }
   ]
 }
