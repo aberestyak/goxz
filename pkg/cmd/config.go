@@ -12,8 +12,8 @@ type endpoint struct {
 	Port int
 }
 
-var mandatoryServerEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "SERVER_HOST_TCP-UDP", "SERVER_PORT_TCP-UDP", "REMOTE_HOST_UDP", "REMOTE_PORT_UDP"}
-var mandatoryClientEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "CLIENT_HOST_UDP", "CLIENT_PORT_UDP", "SERVER_HOST_TCP-UDP", "SERVER_PORT_TCP-UDP"}
+var mandatoryServerEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "SERVER_HOST_TCP_UDP", "SERVER_PORT_TCP_UDP", "REMOTE_HOST_UDP", "REMOTE_PORT_UDP"}
+var mandatoryClientEnvs = []string{"BASTION_HOST_SSH", "BASTION_PORT_SSH", "BASTION_SSH_USER", "LOCAL_HOST_TCP", "LOCAL_PORT_TCP", "CLIENT_HOST_UDP", "CLIENT_PORT_UDP", "SERVER_HOST_TCP_UDP", "SERVER_PORT_TCP_UDP"}
 var authEnvs = []string{"SSH_KEY_PATH", "SSH_AUTH_SOCK", "SSH_USER_PASSWORD"}
 
 func (endpoint *endpoint) String() string {
@@ -93,9 +93,9 @@ var bastionTCPEndpoint = endpoint{
 
 // remote for to forward UDP traffic. Bastion here
 var serverTCPtoUDPEndpoint = endpoint{
-	Host: os.Getenv("SERVER_HOST_TCP-UDP"),
+	Host: os.Getenv("SERVER_HOST_TCP_UDP"),
 	Port: func() int {
-		port, _ := strconv.Atoi(os.Getenv("SERVER_PORT_TCP-UDP"))
+		port, _ := strconv.Atoi(os.Getenv("SERVER_PORT_TCP_UDP"))
 		return port
 	}(),
 }

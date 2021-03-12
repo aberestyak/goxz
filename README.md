@@ -9,9 +9,9 @@ Tool for creating ssh reverse tunnel on remote host to local SOCKS server.
 
 Forward UDP traffic over TCP:
 - Open additional UDP endpoint (`CLIENT_HOST_UDP:CLIENT_PORT_UDP`) on client
-- Open additional TCP-UDP endpoint (`SERVER_HOST_TCP-UDP:SERVER_PORT_TCP-UDP` **should be availiable from client!**) on server
-- Client dials `SERVER_HOST_TCP-UDP:SERVER_PORT_TCP-UDP` and forward traffic from local UDP endpoint to this connection
-- Server forwards traffic from TCP-UDP enpoint to specified UDP remote host (`REMOTE_HOST_UDP:REMOTE_PORT_UDP`) and send response over TCP back to client
+- Open additional TCP_UDP endpoint (`SERVER_HOST_TCP_UDP:SERVER_PORT_TCP_UDP` **should be availiable from client!**) on server
+- Client dials `SERVER_HOST_TCP_UDP:SERVER_PORT_TCP_UDP` and forward traffic from local UDP endpoint to this connection
+- Server forwards traffic from TCP_UDP enpoint to specified UDP remote host (`REMOTE_HOST_UDP:REMOTE_PORT_UDP`) and send response over TCP back to client
 
 ## Usage
 
@@ -30,8 +30,8 @@ goxz <server/client>
 | `BASTION_SSH_USER`    | User to login on remote ssh server                                        |
 | `LOCAL_HOST_TCP`      | TCP address on local machine to forward TCP traffic                       |
 | `LOCAL_PORT_TCP`      | TCP port on local machine to forward TCP traffic                          |
-| `SERVER_HOST_TCP-UDP` | TCP address on local machine to forward TCP->UDP traffic (0.0.0.0 mainly) |
-| `SERVER_PORT_TCP-UDP` | TCP port on local machine to forward TCP->UDP traffic                     |
+| `SERVER_HOST_TCP_UDP` | TCP address on local machine to forward TCP->UDP traffic (0.0.0.0 mainly) |
+| `SERVER_PORT_TCP_UDP` | TCP port on local machine to forward TCP->UDP traffic                     |
 | `REMOTE_HOST_UDP`     | Remote host UDP address (DNS server, for example)                         |
 | `REMOTE_PORT_UDP`     | Remote host UDP address (DNS server, for example)                         |
 
@@ -47,8 +47,8 @@ goxz <server/client>
 | `BASTION_SSH_USER`    | User to login on remote ssh server                       |
 | `LOCAL_HOST_TCP`      | TCP address on local machine to forward TCP traffic      |
 | `LOCAL_PORT_TCP`      | TCP port on local machine to forward TCP traffic         |
-| `SERVER_HOST_TCP-UDP` | Server TCP address to forward TCP->UDP traffic           |
-| `SERVER_PORT_TCP-UDP` | Server TCP port to forward TCP->UDP traffic              |
+| `SERVER_HOST_TCP_UDP` | Server TCP address to forward TCP->UDP traffic           |
+| `SERVER_PORT_TCP_UDP` | Server TCP port to forward TCP->UDP traffic              |
 | `CLIENT_HOST_UDP`     | UDP address on local machine to forward TCP->UDP traffic |
 | `CLIENT_PORT_UDP`     | UDP port on local machine to forward TCP->UDP traffic    |
 
